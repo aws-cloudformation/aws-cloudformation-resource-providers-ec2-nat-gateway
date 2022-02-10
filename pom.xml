@@ -18,6 +18,18 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.amazonaws</groupId>
+                <artifactId>aws-java-sdk-bom</artifactId>
+                <version>1.11.1000</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
         <!-- https://mvnrepository.com/artifact/software.amazon.cloudformation/aws-cloudformation-rpdk-java-plugin -->
         <dependency>
@@ -79,6 +91,26 @@
             <version>3.6.0</version>
             <scope>test</scope>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/software.amazon.awssdk/ec2 -->
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>ec2</artifactId>
+            <version>2.17.115</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/software.amazon.awssdk/utils -->
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>utils</artifactId>
+            <version>2.17.118</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/software.amazon.awssdk/sdk-core -->
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>sdk-core</artifactId>
+            <version>2.17.118</version>
+        </dependency>
+
+
     </dependencies>
 
     <build>

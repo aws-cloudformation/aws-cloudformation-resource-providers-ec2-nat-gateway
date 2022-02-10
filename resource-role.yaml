@@ -23,11 +23,10 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
-                - "initech:CreateReport"
-                - "initech:DeleteReport"
-                - "initech:DescribeReport"
-                - "initech:ListReports"
-                - "initech:UpdateReport"
+                - "ec2-managed-nat:CreateNatGateway"
+                - "ec2-managed-nat:CreateTags"
+                - "ec2-managed-nat:DeleteNatGateway"
+                - "ec2-managed-nat:DescribeNatGateway"
                 Resource: "*"
 Outputs:
   ExecutionRoleArn:

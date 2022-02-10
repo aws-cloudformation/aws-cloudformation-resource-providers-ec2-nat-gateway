@@ -1,7 +1,7 @@
 package software.amazon.ec2.natgateway;
 
 import java.time.Duration;
-import software.amazon.awssdk.core.SdkClient;
+import software.amazon.awssdk.services.ec2.Ec2Client;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.OperationStatus;
 import software.amazon.cloudformation.proxy.ProgressEvent;
@@ -27,22 +27,22 @@ public class DeleteHandlerTest extends AbstractTestBase {
     private AmazonWebServicesClientProxy proxy;
 
     @Mock
-    private ProxyClient<SdkClient> proxyClient;
+    private ProxyClient<Ec2Client> proxyClient;
 
     @Mock
-    SdkClient sdkClient;
+    Ec2Client Ec2Client;
 
     @BeforeEach
     public void setup() {
         proxy = new AmazonWebServicesClientProxy(logger, MOCK_CREDENTIALS, () -> Duration.ofSeconds(600).toMillis());
-        sdkClient = mock(SdkClient.class);
-        proxyClient = MOCK_PROXY(proxy, sdkClient);
+        Ec2Client = mock(Ec2Client.class);
+        proxyClient = MOCK_PROXY(proxy, Ec2Client);
     }
 
     @AfterEach
     public void tear_down() {
-        verify(sdkClient, atLeastOnce()).serviceName();
-        verifyNoMoreInteractions(sdkClient);
+        verify(Ec2Client, atLeastOnce()).serviceName();
+        verifyNoMoreInteractions(Ec2Client);
     }
 
     @Test

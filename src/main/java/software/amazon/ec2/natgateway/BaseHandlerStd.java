@@ -1,6 +1,8 @@
 package software.amazon.ec2.natgateway;
 
-import software.amazon.awssdk.core.SdkClient;
+import software.amazon.awssdk.awscore.exception.AwsServiceException;
+import software.amazon.awssdk.services.ec2.Ec2Client;
+import software.amazon.cloudformation.exceptions.*;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.ProgressEvent;
@@ -29,6 +31,30 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
     final AmazonWebServicesClientProxy proxy,
     final ResourceHandlerRequest<ResourceModel> request,
     final CallbackContext callbackContext,
-    final ProxyClient<SdkClient> proxyClient,
+    final ProxyClient<Ec2Client> proxyClient,
     final Logger logger);
+
+
+  /**
+   * Translates the exceptions to CloudFormation exceptions based on the EC2 error codes.
+   * @param e the aws exception thrown
+   * @return BaseHandlerException, a cloudformation exception
+   */
+  protected BaseHandlerException handleError(final AwsServiceException e){
+    switch(e.awsErrorDetails().errorCode()){
+      case "InvalidParameter":
+      case "MissingParameter":
+      case "InvalidSubnet":
+      case "InvalidSubnetID.Malformed":
+      case "NatGatewayMalformed":
+      case "InvalidElasticIpID.Malformed": return new CfnInvalidRequestException(e);
+      case "InvalidNatGatewayID.NotFound":
+      case "NatGatewayNotFound":
+      case "InvalidSubnetID.NotFound":
+      case "InvalidElasticIpID.NotFound": return new CfnNotFoundException(e);
+      case "NatGatewayLimitExceeded": return new CfnServiceLimitExceededException(e);
+      case "UnauthorizedOperation": return new CfnAccessDeniedException(e);
+      default: return new CfnGeneralServiceException(e);
+    }
+  }
 }

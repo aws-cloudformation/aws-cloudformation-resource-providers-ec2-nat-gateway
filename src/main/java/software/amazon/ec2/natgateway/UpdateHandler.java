@@ -1,11 +1,11 @@
 package software.amazon.ec2.natgateway;
 
-// TODO: replace all usage of SdkClient with your service client type, e.g; YourServiceAsyncClient
+// TODO: replace all usage of Ec2Client with your service client type, e.g; YourServiceAsyncClient
 // import software.amazon.awssdk.services.yourservice.YourServiceAsyncClient;
 
 import software.amazon.awssdk.awscore.AwsResponse;
 import software.amazon.awssdk.awscore.exception.AwsServiceException;
-import software.amazon.awssdk.core.SdkClient;
+import software.amazon.awssdk.services.ec2.Ec2Client;
 import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Logger;
@@ -20,7 +20,7 @@ public class UpdateHandler extends BaseHandlerStd {
         final AmazonWebServicesClientProxy proxy,
         final ResourceHandlerRequest<ResourceModel> request,
         final CallbackContext callbackContext,
-        final ProxyClient<SdkClient> proxyClient,
+        final ProxyClient<Ec2Client> proxyClient,
         final Logger logger) {
 
         this.logger = logger;

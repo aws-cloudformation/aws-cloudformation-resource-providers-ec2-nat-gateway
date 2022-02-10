@@ -3,12 +3,10 @@ package software.amazon.ec2.natgateway;
 import com.google.common.collect.Lists;
 import software.amazon.awssdk.awscore.AwsRequest;
 import software.amazon.awssdk.awscore.AwsResponse;
+import software.amazon.awssdk.services.ec2.model.*;
+import software.amazon.awssdk.services.ec2.model.Tag;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -26,11 +24,12 @@ public class Translator {
    * @param model resource model
    * @return awsRequest the aws service request to create a resource
    */
-  static AwsRequest translateToCreateRequest(final ResourceModel model) {
-    final AwsRequest awsRequest = null;
-    // TODO: construct a request
-    // e.g. https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-logs/blob/2077c92299aeb9a68ae8f4418b5e932b12a8b186/aws-logs-loggroup/src/main/java/com/aws/logs/loggroup/Translator.java#L39-L43
-    return awsRequest;
+  static CreateNatGatewayRequest translateToCreateRequest(final  ResourceModel model) {
+    return CreateNatGatewayRequest.builder().subnetId(model.getSubnetId())
+            .allocationId(model.getAllocationId())
+            .connectivityType(model.getConnectivityType())
+            .tagSpecifications(convertNatTagsToTagSpecification(model.getTags()).orElse(null))
+            .build();
   }
 
   /**
@@ -38,23 +37,24 @@ public class Translator {
    * @param model resource model
    * @return awsRequest the aws service request to describe a resource
    */
-  static AwsRequest translateToReadRequest(final ResourceModel model) {
-    final AwsRequest awsRequest = null;
-    // TODO: construct a request
-    // e.g. https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-logs/blob/2077c92299aeb9a68ae8f4418b5e932b12a8b186/aws-logs-loggroup/src/main/java/com/aws/logs/loggroup/Translator.java#L20-L24
-    return awsRequest;
+  static DescribeNatGatewaysRequest translateToReadRequest(final ResourceModel model) {
+    return DescribeNatGatewaysRequest.builder().natGatewayIds(Collections.singletonList(model.getId())).build();
   }
 
   /**
    * Translates resource object from sdk into a resource model
-   * @param awsResponse the aws service describe resource response
+   * @param describeNatGatewaysResponse the aws service describe resource response
    * @return model resource model
    */
-  static ResourceModel translateFromReadResponse(final AwsResponse awsResponse) {
-    // e.g. https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-logs/blob/2077c92299aeb9a68ae8f4418b5e932b12a8b186/aws-logs-loggroup/src/main/java/com/aws/logs/loggroup/Translator.java#L58-L73
+  static ResourceModel translateFromReadResponse(final DescribeNatGatewaysResponse describeNatGatewaysResponse) {
+    NatGateway natGateway = describeNatGatewaysResponse.natGateways().get(0);
     return ResourceModel.builder()
-        //.someProperty(response.property())
-        .build();
+            .id(natGateway.natGatewayId())
+            .subnetId(natGateway.subnetId())
+            .connectivityType(natGateway.connectivityTypeAsString())
+            .allocationId(natGateway.natGatewayAddresses().get(0).allocationId())
+            .tags(convertToNatTags(natGateway.tags()))
+            .build();
   }
 
   /**
@@ -62,11 +62,8 @@ public class Translator {
    * @param model resource model
    * @return awsRequest the aws service request to delete a resource
    */
-  static AwsRequest translateToDeleteRequest(final ResourceModel model) {
-    final AwsRequest awsRequest = null;
-    // TODO: construct a request
-    // e.g. https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-logs/blob/2077c92299aeb9a68ae8f4418b5e932b12a8b186/aws-logs-loggroup/src/main/java/com/aws/logs/loggroup/Translator.java#L33-L37
-    return awsRequest;
+  static DeleteNatGatewayRequest translateToDeleteRequest(final ResourceModel model) {
+    return DeleteNatGatewayRequest.builder().natGatewayId(model.getId()).build();
   }
 
   /**
@@ -146,5 +143,42 @@ public class Translator {
     // TODO: construct a request
     // e.g. https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-logs/blob/2077c92299aeb9a68ae8f4418b5e932b12a8b186/aws-logs-loggroup/src/main/java/com/aws/logs/loggroup/Translator.java#L39-L43
     return awsRequest;
+  }
+
+  /**
+   * Converts the tags returned from a response to the Tag type from the Nat Gateway Resource Model.
+   * @param tags list of tags
+   * @return List of Nat Gateway Resource tags
+   */
+  static List<software.amazon.ec2.natgateway.Tag> convertToNatTags(final List<Tag> tags) {
+    return Optional.ofNullable(tags).orElse(Collections.emptyList())
+            .stream()
+            .map(tag -> software.amazon.ec2.natgateway.Tag.builder()
+                    .key(tag.key())
+                    .value(tag.value())
+                    .build())
+            .collect(Collectors.toList());
+  }
+
+  /**
+   * Converts the tags from the Nat Gateway Resource Model to the type TagSpecification to pass into requests.
+   * @param tags list of Nat Gateway resource tags
+   * @return List of TagSpecification tags
+   */
+  private static Optional<List<TagSpecification>> convertNatTagsToTagSpecification(final List<software.amazon.ec2.natgateway.Tag> modelTags) {
+    if (modelTags == null) {
+      return Optional.empty();
+    }
+    List<Tag> tags = Optional.of(modelTags).orElse(Collections.emptyList())
+            .stream()
+            .map(tag -> Tag.builder()
+                    .key(tag.getKey())
+                    .value(tag.getValue())
+                    .build())
+            .collect(Collectors.toList());
+    return Optional.of(Arrays.asList(TagSpecification.builder()
+            .resourceType("natgateway")
+            .tags(tags)
+            .build()));
   }
 }
