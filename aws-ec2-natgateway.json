@@ -1,48 +1,61 @@
 {
-  "typeName" : "AWS::EC2::NatGateway",
-  "description" : "Resource Type definition for AWS::EC2::NatGateway",
-  "additionalProperties" : false,
-  "properties" : {
-    "SubnetId" : {
-      "type" : "string"
+  "typeName": "AWS::EC2::NatGateway",
+  "description": "Resource Type definition for AWS::EC2::NatGateway",
+  "additionalProperties": false,
+  "properties": {
+    "SubnetId": {
+      "type": "string"
     },
-    "Id" : {
-      "type" : "string"
+    "Id": {
+      "type": "string"
     },
-    "ConnectivityType" : {
-      "type" : "string"
+    "ConnectivityType": {
+      "type": "string"
     },
-    "Tags" : {
-      "type" : "array",
-      "uniqueItems" : false,
+    "Tags": {
+      "type": "array",
+      "uniqueItems": false,
       "insertionOrder": false,
-      "items" : {
-        "$ref" : "#/definitions/Tag"
+      "items": {
+        "$ref": "#/definitions/Tag"
       }
     },
-    "AllocationId" : {
-      "type" : "string"
+    "AllocationId": {
+      "type": "string"
     }
   },
-  "definitions" : {
-    "Tag" : {
-      "type" : "object",
-      "additionalProperties" : false,
-      "properties" : {
-        "Value" : {
-          "type" : "string"
+  "definitions": {
+    "Tag": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Value": {
+          "type": "string"
         },
-        "Key" : {
-          "type" : "string"
+        "Key": {
+          "type": "string"
         }
       },
-      "required" : [ "Value", "Key" ]
+      "required": [
+        "Value",
+        "Key"
+      ]
     }
   },
-  "required" : [ "SubnetId" ],
-  "createOnlyProperties" : [ "/properties/SubnetId", "/properties/ConnectivityType", "/properties/AllocationId" ],
-  "primaryIdentifier" : [ "/properties/Id" ],
-  "readOnlyProperties" : [ "/properties/Id" ],
+  "required": [
+    "SubnetId"
+  ],
+  "createOnlyProperties": [
+    "/properties/SubnetId",
+    "/properties/ConnectivityType",
+    "/properties/AllocationId"
+  ],
+  "primaryIdentifier": [
+    "/properties/Id"
+  ],
+  "readOnlyProperties": [
+    "/properties/Id"
+  ],
   "handlers": {
     "create": {
       "permissions": [
