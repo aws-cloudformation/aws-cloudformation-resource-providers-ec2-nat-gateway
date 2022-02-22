@@ -82,16 +82,16 @@ public class CreateHandler extends BaseHandlerStd {
             final CallbackContext callbackContext) {
 
         try {
-            final DescribeNatGatewaysResponse describeNatGatewaysResponse =
+            final NatGateway natGateway =
                     proxyClient.injectCredentialsAndInvokeV2(Translator.translateToReadRequest(model),
-                            proxyClient.client()::describeNatGateways);
-            final String state = describeNatGatewaysResponse.natGateways().get(0).stateAsString();
-            final String natId = describeNatGatewaysResponse.natGateways().get(0).natGatewayId();
+                            proxyClient.client()::describeNatGateways).natGateways().get(0);
+            final String natId = natGateway.natGatewayId();
+            final String state = natGateway.stateAsString();
             if (state.equalsIgnoreCase(State.AVAILABLE.toString())) {
-                logger.log(String.format("%s has stabilized and is fully available.", ResourceModel.TYPE_NAME));
+                logger.log(String.format("%s %s has stabilized and is fully available.", ResourceModel.TYPE_NAME, natId));
                 return true;
             } else if(state.equalsIgnoreCase(State.FAILED.toString())){
-                final String failureMessage = describeNatGatewaysResponse.natGateways().get(0).failureMessage();
+                final String failureMessage = natGateway.failureMessage();
                 final String message = String.format("NatGateway %s is in state %s and hence failed to stabilize. " +
                         "Detailed failure message: %s", natId, state, failureMessage);
                 logger.log(message);
@@ -100,7 +100,7 @@ public class CreateHandler extends BaseHandlerStd {
                 return false;
             }
         } catch (final AwsServiceException e) {
-            logger.log(String.format("DescribeNatGateways API call during stablization failed with exception: %s",
+            logger.log(String.format("DescribeNatGateways API call failed during stabilization with exception: %s",
                     e.getMessage()));
             throw handleError(e);
         }

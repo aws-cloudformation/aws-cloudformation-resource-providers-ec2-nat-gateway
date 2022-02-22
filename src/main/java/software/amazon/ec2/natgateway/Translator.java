@@ -101,7 +101,7 @@ public class Translator {
     return awsRequest;
   }
 
-  /**
+  /** TODO: implement method
    * Translates resource objects from sdk into a resource model (primary identifier only)
    * @param awsResponse the aws service describe resource response
    * @return list of resource models

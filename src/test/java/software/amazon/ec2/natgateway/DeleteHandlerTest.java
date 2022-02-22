@@ -55,15 +55,15 @@ public class DeleteHandlerTest extends AbstractTestBase {
 
     @Test
     public void handleRequest_SimpleSuccess() {
-        final NatGateway nGW = mockNatGateway(CONN_PUBLIC, State.DELETED.toString());
-        final DeleteNatGatewayResponse deleteResponse = DeleteNatGatewayResponse.builder().natGatewayId(nGW.natGatewayId()).build();
+        final NatGateway natGateway = buildNatGatewayModel(CONN_PUBLIC, State.DELETED.toString());
+        final DeleteNatGatewayResponse deleteResponse = DeleteNatGatewayResponse.builder().natGatewayId(natGateway.natGatewayId()).build();
         when(proxyClient.client().deleteNatGateway(ArgumentMatchers.any(DeleteNatGatewayRequest.class))).thenReturn(deleteResponse);
 
-        final DescribeNatGatewaysResponse describeResponse = DescribeNatGatewaysResponse.builder().natGateways(Collections.singletonList(nGW)).build();
+        final DescribeNatGatewaysResponse describeResponse = DescribeNatGatewaysResponse.builder().natGateways(Collections.singletonList(natGateway)).build();
         when(proxyClient.client().describeNatGateways(ArgumentMatchers.any(DescribeNatGatewaysRequest.class))).thenReturn(describeResponse);
         final DeleteHandler handler = new DeleteHandler();
 
-        final ResourceHandlerRequest<ResourceModel> request = mockResourceHandleRequest();
+        final ResourceHandlerRequest<ResourceModel> request = createResourceHandlerRequest();
 
         final ProgressEvent<ResourceModel, CallbackContext> response = handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
 
@@ -78,15 +78,15 @@ public class DeleteHandlerTest extends AbstractTestBase {
 
     @Test
     public void handleRequest_StabilizationFailure() {
-        final NatGateway nGW = mockNatGateway(CONN_PUBLIC, State.FAILED.toString());
-        final DeleteNatGatewayResponse deleteResponse = DeleteNatGatewayResponse.builder().natGatewayId(nGW.natGatewayId()).build();
+        final NatGateway natGateway = buildNatGatewayModel(CONN_PUBLIC, State.FAILED.toString());
+        final DeleteNatGatewayResponse deleteResponse = DeleteNatGatewayResponse.builder().natGatewayId(natGateway.natGatewayId()).build();
         when(proxyClient.client().deleteNatGateway(ArgumentMatchers.any(DeleteNatGatewayRequest.class))).thenReturn(deleteResponse);
 
-        final DescribeNatGatewaysResponse describeResponse = DescribeNatGatewaysResponse.builder().natGateways(Collections.singletonList(nGW)).build();
+        final DescribeNatGatewaysResponse describeResponse = DescribeNatGatewaysResponse.builder().natGateways(Collections.singletonList(natGateway)).build();
         when(proxyClient.client().describeNatGateways(ArgumentMatchers.any(DescribeNatGatewaysRequest.class))).thenReturn(describeResponse);
 
         final DeleteHandler handler = new DeleteHandler();
-        final ResourceHandlerRequest<ResourceModel> request = mockResourceHandleRequest();
+        final ResourceHandlerRequest<ResourceModel> request = createResourceHandlerRequest();
 
         Assertions.assertThrows(CfnGeneralServiceException.class, () -> {
             handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
@@ -102,7 +102,7 @@ public class DeleteHandlerTest extends AbstractTestBase {
                 .thenThrow(awsServiceException);
 
         final DeleteHandler handler = new DeleteHandler();
-        final ResourceHandlerRequest<ResourceModel> request = mockResourceHandleRequest();
+        final ResourceHandlerRequest<ResourceModel> request = createResourceHandlerRequest();
 
         Assertions.assertThrows(CfnNotFoundException.class, () -> {
             handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
@@ -118,7 +118,7 @@ public class DeleteHandlerTest extends AbstractTestBase {
                 .thenThrow(awsServiceException);
 
         final DeleteHandler handler = new DeleteHandler();
-        final ResourceHandlerRequest<ResourceModel> request = mockResourceHandleRequest();
+        final ResourceHandlerRequest<ResourceModel> request = createResourceHandlerRequest();
 
         Assertions.assertThrows(CfnInvalidRequestException.class, () -> {
             handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);

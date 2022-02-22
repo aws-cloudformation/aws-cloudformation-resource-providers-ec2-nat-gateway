@@ -55,15 +55,15 @@ public class CreateHandlerTest extends AbstractTestBase {
 
     @Test
     public void handleRequest_SimpleSuccess() {
-        final NatGateway nGW = mockNatGateway(CONN_PUBLIC, State.AVAILABLE.toString());
-        final CreateNatGatewayResponse createResponse = CreateNatGatewayResponse.builder().natGateway(nGW).build();
+        final NatGateway natGateway = buildNatGatewayModel(CONN_PUBLIC, State.AVAILABLE.toString());
+        final CreateNatGatewayResponse createResponse = CreateNatGatewayResponse.builder().natGateway(natGateway).build();
         when(proxyClient.client().createNatGateway(ArgumentMatchers.any(CreateNatGatewayRequest.class))).thenReturn(createResponse);
 
-        final DescribeNatGatewaysResponse describeResponse = DescribeNatGatewaysResponse.builder().natGateways(Collections.singletonList(nGW)).build();
+        final DescribeNatGatewaysResponse describeResponse = DescribeNatGatewaysResponse.builder().natGateways(Collections.singletonList(natGateway)).build();
         when(proxyClient.client().describeNatGateways(ArgumentMatchers.any(DescribeNatGatewaysRequest.class))).thenReturn(describeResponse);
 
         final CreateHandler handler = new CreateHandler();
-        final ResourceHandlerRequest<ResourceModel> request = mockResourceHandleRequest();
+        final ResourceHandlerRequest<ResourceModel> request = createResourceHandlerRequest();
         final ProgressEvent<ResourceModel, CallbackContext> response = handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
 
         assertThat(response).isNotNull();
@@ -78,15 +78,15 @@ public class CreateHandlerTest extends AbstractTestBase {
 
     @Test
     public void handleRequest_StabilizationFailure() {
-        final NatGateway nGW = mockNatGateway(CONN_PUBLIC, State.FAILED.toString());
-        final CreateNatGatewayResponse createResponse = CreateNatGatewayResponse.builder().natGateway(nGW).build();
+        final NatGateway natGateway = buildNatGatewayModel(CONN_PUBLIC, State.FAILED.toString());
+        final CreateNatGatewayResponse createResponse = CreateNatGatewayResponse.builder().natGateway(natGateway).build();
         when(proxyClient.client().createNatGateway(ArgumentMatchers.any(CreateNatGatewayRequest.class))).thenReturn(createResponse);
 
-        final DescribeNatGatewaysResponse describeResponse = DescribeNatGatewaysResponse.builder().natGateways(Collections.singletonList(nGW)).build();
+        final DescribeNatGatewaysResponse describeResponse = DescribeNatGatewaysResponse.builder().natGateways(Collections.singletonList(natGateway)).build();
         when(proxyClient.client().describeNatGateways(ArgumentMatchers.any(DescribeNatGatewaysRequest.class))).thenReturn(describeResponse);
 
         final CreateHandler handler = new CreateHandler();
-        final ResourceHandlerRequest<ResourceModel> request = mockResourceHandleRequest();
+        final ResourceHandlerRequest<ResourceModel> request = createResourceHandlerRequest();
 
         Assertions.assertThrows(CfnGeneralServiceException.class, () -> {
             handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
@@ -102,7 +102,7 @@ public class CreateHandlerTest extends AbstractTestBase {
                 .thenThrow(awsServiceException);
 
         final CreateHandler handler = new CreateHandler();
-        final ResourceHandlerRequest<ResourceModel> request = mockResourceHandleRequest();
+        final ResourceHandlerRequest<ResourceModel> request = createResourceHandlerRequest();
 
         Assertions.assertThrows(CfnInvalidRequestException.class, () -> {
             handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
@@ -118,7 +118,7 @@ public class CreateHandlerTest extends AbstractTestBase {
                 .thenThrow(awsServiceException);
 
         final CreateHandler handler = new CreateHandler();
-        final ResourceHandlerRequest<ResourceModel> request = mockResourceHandleRequest();
+        final ResourceHandlerRequest<ResourceModel> request = createResourceHandlerRequest();
 
         Assertions.assertThrows(CfnNotFoundException.class, () -> {
             handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
@@ -134,7 +134,7 @@ public class CreateHandlerTest extends AbstractTestBase {
                 .thenThrow(awsServiceException);
 
         final CreateHandler handler = new CreateHandler();
-        final ResourceHandlerRequest<ResourceModel> request = mockResourceHandleRequest();
+        final ResourceHandlerRequest<ResourceModel> request = createResourceHandlerRequest();
 
         Assertions.assertThrows(CfnInvalidRequestException.class, () -> {
             handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
@@ -150,7 +150,7 @@ public class CreateHandlerTest extends AbstractTestBase {
                 .thenThrow(awsServiceException);
 
         final CreateHandler handler = new CreateHandler();
-        final ResourceHandlerRequest<ResourceModel> request = mockResourceHandleRequest();
+        final ResourceHandlerRequest<ResourceModel> request = createResourceHandlerRequest();
 
         Assertions.assertThrows(CfnNotFoundException.class, () -> {
             handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
@@ -166,7 +166,7 @@ public class CreateHandlerTest extends AbstractTestBase {
                 .thenThrow(awsServiceException);
 
         final CreateHandler handler = new CreateHandler();
-        final ResourceHandlerRequest<ResourceModel> request = mockResourceHandleRequest();
+        final ResourceHandlerRequest<ResourceModel> request = createResourceHandlerRequest();
 
         Assertions.assertThrows(CfnServiceLimitExceededException.class, () -> {
             handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
