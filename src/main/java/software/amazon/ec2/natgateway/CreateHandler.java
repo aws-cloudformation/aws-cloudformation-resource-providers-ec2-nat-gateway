@@ -88,7 +88,7 @@ public class CreateHandler extends BaseHandlerStd {
             final String natId = natGateway.natGatewayId();
             final String state = natGateway.stateAsString();
             if (state.equalsIgnoreCase(State.AVAILABLE.toString())) {
-                logger.log(String.format("%s %s has stabilized and is fully available.", ResourceModel.TYPE_NAME, natId));
+                logger.log(String.format("%s %s has stabilized and is fully created.", ResourceModel.TYPE_NAME, natId));
                 return true;
             } else if(state.equalsIgnoreCase(State.FAILED.toString())){
                 final String failureMessage = natGateway.failureMessage();

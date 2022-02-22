@@ -4,10 +4,7 @@ import software.amazon.awssdk.awscore.AwsRequest;
 import software.amazon.awssdk.awscore.AwsResponse;
 import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.services.ec2.Ec2Client;
-import software.amazon.awssdk.services.ec2.model.DeleteNatGatewayRequest;
-import software.amazon.awssdk.services.ec2.model.DeleteNatGatewayResponse;
-import software.amazon.awssdk.services.ec2.model.DescribeNatGatewaysResponse;
-import software.amazon.awssdk.services.ec2.model.State;
+import software.amazon.awssdk.services.ec2.model.*;
 import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Logger;
@@ -83,16 +80,16 @@ public class DeleteHandler extends BaseHandlerStd {
             final CallbackContext callbackContext) {
 
         try {
-            final DescribeNatGatewaysResponse describeNatGatewaysResponse =
+            final NatGateway natGateway =
                     proxyClient.injectCredentialsAndInvokeV2(Translator.translateToReadRequest(model),
-                            proxyClient.client()::describeNatGateways);
-            final String state = describeNatGatewaysResponse.natGateways().get(0).stateAsString();
-            final String natId = describeNatGatewaysResponse.natGateways().get(0).natGatewayId();
+                            proxyClient.client()::describeNatGateways).natGateways().get(0);
+            final String natId = natGateway.natGatewayId();
+            final String state = natGateway.stateAsString();
             if (state.equalsIgnoreCase(State.DELETED.toString())) {
-                logger.log(String.format("%s has stabilized and is fully deleted.", ResourceModel.TYPE_NAME));
+                logger.log(String.format("%s %s has stabilized and is fully deleted.", ResourceModel.TYPE_NAME, natId));
                 return true;
             } else if(state.equalsIgnoreCase(State.FAILED.toString())){
-                final String failureMessage = describeNatGatewaysResponse.natGateways().get(0).failureMessage();
+                final String failureMessage = natGateway.failureMessage();
                 final String message = String.format("NatGateway %s is in state %s and hence failed to stabilize. " +
                         "Detailed failure message: %s", natId, state, failureMessage);
                 logger.log(message);
@@ -101,7 +98,7 @@ public class DeleteHandler extends BaseHandlerStd {
                 return false;
             }
         } catch (final AwsServiceException e) {
-            logger.log(String.format("DescribeNatGateways API call during stablization failed with exception: %s",
+            logger.log(String.format("DescribeNatGateways API call failed during stablization with exception: %s",
                     e.getMessage()));
             throw handleError(e);
         }
