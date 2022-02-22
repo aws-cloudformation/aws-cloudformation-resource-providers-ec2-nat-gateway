@@ -1,7 +1,17 @@
 package software.amazon.ec2.natgateway;
 
 import java.time.Duration;
+import java.util.Collections;
+
+import org.junit.jupiter.api.Assertions;
+import org.mockito.ArgumentMatchers;
+import software.amazon.awssdk.awscore.exception.AwsErrorDetails;
+import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.services.ec2.Ec2Client;
+import software.amazon.awssdk.services.ec2.model.*;
+import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
+import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
+import software.amazon.cloudformation.exceptions.CfnNotFoundException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.OperationStatus;
 import software.amazon.cloudformation.proxy.ProgressEvent;
@@ -15,10 +25,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class DeleteHandlerTest extends AbstractTestBase {
@@ -47,13 +55,15 @@ public class DeleteHandlerTest extends AbstractTestBase {
 
     @Test
     public void handleRequest_SimpleSuccess() {
+        final NatGateway natGateway = buildNatGatewayModel(CONN_PUBLIC, State.DELETED.toString());
+        final DeleteNatGatewayResponse deleteResponse = DeleteNatGatewayResponse.builder().natGatewayId(natGateway.natGatewayId()).build();
+        when(proxyClient.client().deleteNatGateway(ArgumentMatchers.any(DeleteNatGatewayRequest.class))).thenReturn(deleteResponse);
+
+        final DescribeNatGatewaysResponse describeResponse = DescribeNatGatewaysResponse.builder().natGateways(Collections.singletonList(natGateway)).build();
+        when(proxyClient.client().describeNatGateways(ArgumentMatchers.any(DescribeNatGatewaysRequest.class))).thenReturn(describeResponse);
         final DeleteHandler handler = new DeleteHandler();
 
-        final ResourceModel model = ResourceModel.builder().build();
-
-        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
-            .desiredResourceState(model)
-            .build();
+        final ResourceHandlerRequest<ResourceModel> request = createResourceHandlerRequest();
 
         final ProgressEvent<ResourceModel, CallbackContext> response = handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
 
@@ -64,5 +74,54 @@ public class DeleteHandlerTest extends AbstractTestBase {
         assertThat(response.getResourceModels()).isNull();
         assertThat(response.getMessage()).isNull();
         assertThat(response.getErrorCode()).isNull();
+    }
+
+    @Test
+    public void handleRequest_StabilizationFailure() {
+        final NatGateway natGateway = buildNatGatewayModel(CONN_PUBLIC, State.FAILED.toString());
+        final DeleteNatGatewayResponse deleteResponse = DeleteNatGatewayResponse.builder().natGatewayId(natGateway.natGatewayId()).build();
+        when(proxyClient.client().deleteNatGateway(ArgumentMatchers.any(DeleteNatGatewayRequest.class))).thenReturn(deleteResponse);
+
+        final DescribeNatGatewaysResponse describeResponse = DescribeNatGatewaysResponse.builder().natGateways(Collections.singletonList(natGateway)).build();
+        when(proxyClient.client().describeNatGateways(ArgumentMatchers.any(DescribeNatGatewaysRequest.class))).thenReturn(describeResponse);
+
+        final DeleteHandler handler = new DeleteHandler();
+        final ResourceHandlerRequest<ResourceModel> request = createResourceHandlerRequest();
+
+        Assertions.assertThrows(CfnGeneralServiceException.class, () -> {
+            handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
+        });
+    }
+
+    @Test
+    public void handleRequest_natGatewayNotFound(){
+        AwsErrorDetails awsErrorDetails = AwsErrorDetails.builder().errorCode("NatGatewayNotFound").build();
+        final AwsServiceException awsServiceException = AwsServiceException.builder().awsErrorDetails(awsErrorDetails).build();
+
+        when(proxyClient.client().deleteNatGateway(ArgumentMatchers.any(DeleteNatGatewayRequest.class)))
+                .thenThrow(awsServiceException);
+
+        final DeleteHandler handler = new DeleteHandler();
+        final ResourceHandlerRequest<ResourceModel> request = createResourceHandlerRequest();
+
+        Assertions.assertThrows(CfnNotFoundException.class, () -> {
+            handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
+        });
+    }
+
+    @Test
+    public void handleRequest_invalidNatGateway(){
+        AwsErrorDetails awsErrorDetails = AwsErrorDetails.builder().errorCode("NatGatewayMalformed").build();
+        final AwsServiceException awsServiceException = AwsServiceException.builder().awsErrorDetails(awsErrorDetails).build();
+
+        when(proxyClient.client().deleteNatGateway(ArgumentMatchers.any(DeleteNatGatewayRequest.class)))
+                .thenThrow(awsServiceException);
+
+        final DeleteHandler handler = new DeleteHandler();
+        final ResourceHandlerRequest<ResourceModel> request = createResourceHandlerRequest();
+
+        Assertions.assertThrows(CfnInvalidRequestException.class, () -> {
+            handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
+        });
     }
 }

@@ -49,13 +49,13 @@ public class ReadHandlerTest extends AbstractTestBase {
 
     @Test
     public void handleRequest_SimpleSuccess() {
-        final NatGateway nGW = mockNatGateway(CONN_PUBLIC, State.AVAILABLE.toString());
+        final NatGateway natGateway = buildNatGatewayModel(CONN_PUBLIC, State.AVAILABLE.toString());
 
-        final DescribeNatGatewaysResponse describeResponse = DescribeNatGatewaysResponse.builder().natGateways(Collections.singletonList(nGW)).build();
+        final DescribeNatGatewaysResponse describeResponse = DescribeNatGatewaysResponse.builder().natGateways(Collections.singletonList(natGateway)).build();
         when(proxyClient.client().describeNatGateways(ArgumentMatchers.any(DescribeNatGatewaysRequest.class))).thenReturn(describeResponse);
 
         final ReadHandler handler = new ReadHandler();
-        final ResourceHandlerRequest<ResourceModel> request = mockResourceHandleRequest();
+        final ResourceHandlerRequest<ResourceModel> request = createResourceHandlerRequest();
         final ProgressEvent<ResourceModel, CallbackContext> response = handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
 
         assertThat(response).isNotNull();

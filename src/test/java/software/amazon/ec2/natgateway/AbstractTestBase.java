@@ -77,7 +77,7 @@ public class AbstractTestBase {
     };
   }
 
-  protected ResourceHandlerRequest<ResourceModel>  mockResourceHandleRequest(){
+  protected ResourceHandlerRequest<ResourceModel>  createResourceHandlerRequest(){
     final ResourceModel model = ResourceModel.builder()
             .id(NAT_ID)
             .subnetId(SUBNET_ID)
@@ -89,7 +89,7 @@ public class AbstractTestBase {
     return ResourceHandlerRequest.<ResourceModel>builder().desiredResourceState(model).build();
   }
 
-  protected NatGateway mockNatGateway(String connType, String state){
+  protected NatGateway buildNatGatewayModel(String connType, String state){
     NatGatewayAddress addr = connType.equals(CONN_PUBLIC) ? NatGatewayAddress.builder().allocationId(ALLOC_ID).build() : null;
     return NatGateway.builder()
             .natGatewayId(NAT_ID)
