@@ -1,0 +1,11 @@
+{
+  "SubnetId": "<subnetId>",
+  "ConnectivityType": "<type>",
+  "Tags": [
+    {
+      "Value": "<val>",
+      "Key": "<key>"
+    }
+  ],
+  "AllocationId": "<allocationId>"
+}
