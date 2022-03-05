@@ -29,15 +29,12 @@ public class DeleteHandler extends BaseHandlerStd {
         this.logger = logger;
 
         return ProgressEvent.progress(request.getDesiredResourceState(), callbackContext)
+            // This check verifies that the resource exists before deleting. If the resource has already been deleted,
+            // a ResourceNotFound exception is thrown.
             .then(progress ->
                     proxy.initiate("AWS-EC2-NatGateway::Delete::PreDeletionCheck", proxyClient, progress.getResourceModel(), progress.getCallbackContext())
                          .translateToServiceRequest(Translator::translateToReadRequest)
-                         .makeServiceCall((awsRequest, _proxyClient) -> readResource(awsRequest, proxyClient , logger))
-                         .handleError((awsRequest, exception, client, resourceModel, context) -> {
-                             if (exception instanceof ResourceNotFoundException)
-                                 return ProgressEvent.success(resourceModel, context);
-                             throw exception;
-                         })
+                         .makeServiceCall((awsRequest, _proxyClient) -> readResource(awsRequest, proxyClient, logger))
                          .progress()
             )
             .then(progress ->
@@ -52,7 +49,7 @@ public class DeleteHandler extends BaseHandlerStd {
 
 
     /**
-     * Creates the NAT Gateway resource by calling the deleteNatGateway API
+     * Deletes the NAT Gateway resource by calling the deleteNatGateway API
      * @param deleteNatGatewayRequest   Request made by the client
      * @param proxyClient               aws ec2 client used to make request
      * @param logger                    used to log
@@ -75,8 +72,7 @@ public class DeleteHandler extends BaseHandlerStd {
     }
 
     /**
-     * Verifies that the state of the Nat Gateway created has gone to DELETED. If the state is FAILED, then it throws
-     * an exception and fails the Resource Creation.
+     * Verifies that the state of the Nat Gateway has gone to DELETED.
      * @param awsRequest        Request made by the client
      * @param awsResponse       Response from the request
      * @param proxyClient       aws ec2 client used to make request
@@ -97,14 +93,9 @@ public class DeleteHandler extends BaseHandlerStd {
                             proxyClient.client()::describeNatGateways).natGateways().get(0);
             final String natId = natGateway.natGatewayId();
             final String state = natGateway.stateAsString();
-            if (state.equalsIgnoreCase(State.DELETED.toString())) {
+            if (State.DELETED.toString().equalsIgnoreCase(state)) {
                 logger.log(String.format("%s %s has stabilized and is fully deleted.", ResourceModel.TYPE_NAME, natId));
                 return true;
-            } else if(state.equalsIgnoreCase(State.FAILED.toString())){
-                final String message = String.format("NatGateway %s is in state %s and hence failed to stabilize. " +
-                        "Detailed failure message: %s", natId, state, natGateway.failureMessage());
-                logger.log(message);
-                throw new CfnGeneralServiceException(message);
             } else {
                 return false;
             }

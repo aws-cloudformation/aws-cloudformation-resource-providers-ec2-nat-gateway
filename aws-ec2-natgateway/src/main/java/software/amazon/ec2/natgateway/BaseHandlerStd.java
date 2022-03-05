@@ -3,7 +3,7 @@ package software.amazon.ec2.natgateway;
 import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.services.ec2.Ec2Client;
 import software.amazon.awssdk.services.ec2.model.DescribeNatGatewaysRequest;
-import software.amazon.awssdk.services.ec2.model.DescribeNatGatewaysResponse;
+import software.amazon.awssdk.services.ec2.model.NatGateway;
 import software.amazon.awssdk.services.ec2.model.State;
 import software.amazon.cloudformation.exceptions.BaseHandlerException;
 import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
@@ -19,6 +19,9 @@ import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ProxyClient;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
+/**
+ * This abstract class contains functionality shared across the different handlers that extend it.
+ */
 public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
   @Override
   public final ProgressEvent<ResourceModel, CallbackContext> handleRequest(
@@ -48,8 +51,8 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
    * @param e the aws exception thrown
    * @return BaseHandlerException, a CloudFormation exception
    */
-  protected BaseHandlerException handleError(final AwsServiceException e){
-    switch(e.awsErrorDetails().errorCode()){
+  protected BaseHandlerException handleError(final AwsServiceException e) {
+    switch(e.awsErrorDetails().errorCode()) {
       case "InvalidParameter":
       case "MissingParameter":
       case "InvalidSubnet":
@@ -80,24 +83,24 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
    * @param describeNatGatewaysRequest   Request made by the client
    * @param proxyClient                  aws ec2 client used to make request
    * @param logger                       used to log
-   * @return DescribeNatGateways Response
+   * @return NatGateway received from the Describe Response
    */
-  protected DescribeNatGatewaysResponse readResource(
+  protected NatGateway readResource(
           final DescribeNatGatewaysRequest describeNatGatewaysRequest,
           final ProxyClient<Ec2Client> proxyClient,
           final Logger logger) {
-    DescribeNatGatewaysResponse describeNatGatewaysResponse;
+    NatGateway natGateway;
     try {
-      describeNatGatewaysResponse = proxyClient.injectCredentialsAndInvokeV2(describeNatGatewaysRequest,
-              proxyClient.client()::describeNatGateways);
+      natGateway = proxyClient.injectCredentialsAndInvokeV2(describeNatGatewaysRequest,
+              proxyClient.client()::describeNatGateways).natGateways().get(0);
       // The Read Handler should only return a non-deleted NAT Gateway
-      if(describeNatGatewaysResponse.natGateways().get(0).stateAsString().equalsIgnoreCase(State.DELETED.toString())){
-        throw new ResourceNotFoundException(new Throwable("Nat Gateway is deleted."));
+      if(State.DELETED.toString().equalsIgnoreCase(natGateway.stateAsString())) {
+        throw new ResourceNotFoundException(ResourceModel.TYPE_NAME, natGateway.natGatewayId());
       }
     } catch (final AwsServiceException e) {
       throw handleError(e);
     }
     logger.log(String.format("%s has successfully been read.", ResourceModel.TYPE_NAME));
-    return describeNatGatewaysResponse;
+    return natGateway;
   }
 }

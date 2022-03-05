@@ -1,11 +1,15 @@
 {
-  "SubnetId": "<subnetId>",
-  "ConnectivityType": "<type>",
+  "SubnetId": "{{UluruSubnet}}",
+  "ConnectivityType": "public",
   "Tags": [
     {
-      "Value": "<val>",
-      "Key": "<key>"
+      "Value": "val",
+      "Key": "key"
+    },
+    {
+      "Value": "val2",
+      "Key": "key2"
     }
   ],
-  "AllocationId": "<allocationId>"
+  "AllocationId": "{{UluruAllocationId}}"
 }

@@ -10,7 +10,11 @@ import software.amazon.awssdk.services.ec2.model.TagSpecification;
 import software.amazon.awssdk.services.ec2.model.Tag;
 import software.amazon.awssdk.services.ec2.model.NatGateway;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -51,11 +55,10 @@ public class Translator {
 
   /**
    * Translates NAT Gateway from the Describe response into a NAT Gateway resource model
-   * @param describeNatGatewaysResponse the aws service describe resource response
+   * @param natGateway given Nat Gateway received from a Describe response
    * @return model AWS::EC2::NatGateway resource model
    */
-  static ResourceModel translateFromReadResponse(final DescribeNatGatewaysResponse describeNatGatewaysResponse) {
-    NatGateway natGateway = describeNatGatewaysResponse.natGateways().get(0);
+  static ResourceModel translateNatGatewayToResourceModel(final NatGateway natGateway) {
     return ResourceModel.builder()
             .id(natGateway.natGatewayId())
             .subnetId(natGateway.subnetId())
@@ -161,16 +164,9 @@ public class Translator {
     if (modelTags == null) {
       return Optional.empty();
     }
-    List<Tag> tags = Optional.of(modelTags).orElse(Collections.emptyList())
-            .stream()
-            .map(tag -> Tag.builder()
-                    .key(tag.getKey())
-                    .value(tag.getValue())
-                    .build())
-            .collect(Collectors.toList());
     return Optional.of(Arrays.asList(TagSpecification.builder()
             .resourceType("natgateway")
-            .tags(tags)
+            .tags(convertToSdkTags(modelTags))
             .build()));
   }
 }

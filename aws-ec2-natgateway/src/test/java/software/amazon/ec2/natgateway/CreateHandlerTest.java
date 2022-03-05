@@ -31,7 +31,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class CreateHandlerTest extends AbstractTestBase {
@@ -53,13 +57,13 @@ public class CreateHandlerTest extends AbstractTestBase {
     }
 
     @AfterEach
-    public void tear_down() {
+    public void tearDown() {
         verify(Ec2Client, atLeastOnce()).serviceName();
         verifyNoMoreInteractions(Ec2Client);
     }
 
     @Test
-    public void handleRequest_SimpleSuccess() {
+    public void handleRequestSimpleSuccess() {
         final NatGateway natGateway = buildNatGatewayModel(NAT_ID, CONN_PUBLIC, State.AVAILABLE.toString());
         final CreateNatGatewayResponse createResponse = CreateNatGatewayResponse.builder().natGateway(natGateway).build();
 
@@ -83,7 +87,7 @@ public class CreateHandlerTest extends AbstractTestBase {
     }
 
     @Test
-    public void handleRequest_StabilizationFailure() {
+    public void handleRequestStabilizationFailure() {
         final NatGateway natGateway = buildNatGatewayModel(NAT_ID, CONN_PUBLIC, State.FAILED.toString());
         final CreateNatGatewayResponse createResponse = CreateNatGatewayResponse.builder().natGateway(natGateway).build();
 
@@ -101,7 +105,7 @@ public class CreateHandlerTest extends AbstractTestBase {
     }
 
     @Test
-    public void handleRequest_invalidSubnet(){
+    public void handleRequestInvalidSubnet() {
         AwsErrorDetails awsErrorDetails = AwsErrorDetails.builder().errorCode("InvalidSubnetID.Malformed").build();
         final AwsServiceException awsServiceException = AwsServiceException.builder().awsErrorDetails(awsErrorDetails).build();
 
@@ -117,7 +121,7 @@ public class CreateHandlerTest extends AbstractTestBase {
     }
 
     @Test
-    public void handleRequest_subnetNotFound(){
+    public void handleRequestSubnetNotFound() {
         AwsErrorDetails awsErrorDetails = AwsErrorDetails.builder().errorCode("InvalidSubnetID.NotFound").build();
         final AwsServiceException awsServiceException = AwsServiceException.builder().awsErrorDetails(awsErrorDetails).build();
 
@@ -133,7 +137,7 @@ public class CreateHandlerTest extends AbstractTestBase {
     }
 
     @Test
-    public void handleRequest_invalidEIP(){
+    public void handleRequestInvalidEIP() {
         AwsErrorDetails awsErrorDetails = AwsErrorDetails.builder().errorCode("InvalidElasticIpID.Malformed").build();
         final AwsServiceException awsServiceException = AwsServiceException.builder().awsErrorDetails(awsErrorDetails).build();
 
@@ -149,7 +153,7 @@ public class CreateHandlerTest extends AbstractTestBase {
     }
 
     @Test
-    public void handleRequest_eipNotFound(){
+    public void handleRequesteipNotFound() {
         AwsErrorDetails awsErrorDetails = AwsErrorDetails.builder().errorCode("InvalidElasticIpID.NotFound").build();
         final AwsServiceException awsServiceException = AwsServiceException.builder().awsErrorDetails(awsErrorDetails).build();
 
@@ -165,7 +169,7 @@ public class CreateHandlerTest extends AbstractTestBase {
     }
 
     @Test
-    public void handleRequest_natLimitExceeded(){
+    public void handleRequestnatLimitExceeded() {
         AwsErrorDetails awsErrorDetails = AwsErrorDetails.builder().errorCode("NatGatewayLimitExceeded").build();
         final AwsServiceException awsServiceException = AwsServiceException.builder().awsErrorDetails(awsErrorDetails).build();
 

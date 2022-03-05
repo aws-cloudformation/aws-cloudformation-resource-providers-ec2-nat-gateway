@@ -14,7 +14,11 @@ import software.amazon.awssdk.core.pagination.sync.SdkIterable;
 import software.amazon.awssdk.services.ec2.model.NatGateway;
 import software.amazon.awssdk.services.ec2.model.NatGatewayAddress;
 import software.amazon.awssdk.services.ec2.model.Tag;
-import software.amazon.cloudformation.proxy.*;
+import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
+import software.amazon.cloudformation.proxy.Credentials;
+import software.amazon.cloudformation.proxy.LoggerProxy;
+import software.amazon.cloudformation.proxy.ProxyClient;
+import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
 public class AbstractTestBase {
   protected static final Credentials MOCK_CREDENTIALS;
@@ -78,7 +82,7 @@ public class AbstractTestBase {
     };
   }
 
-  protected ResourceHandlerRequest<ResourceModel>  createResourceHandlerRequest(){
+  protected ResourceHandlerRequest<ResourceModel> createResourceHandlerRequest() {
     final ResourceModel model = ResourceModel.builder()
             .id(NAT_ID)
             .subnetId(SUBNET_ID)
@@ -89,7 +93,7 @@ public class AbstractTestBase {
     return ResourceHandlerRequest.<ResourceModel>builder().desiredResourceState(model).build();
   }
 
-  protected NatGateway buildNatGatewayModel(String natId, String connType, String state){
+  protected NatGateway buildNatGatewayModel(String natId, String connType, String state) {
     NatGatewayAddress addr = connType.equals(CONN_PUBLIC) ? NatGatewayAddress.builder().allocationId(ALLOC_ID).build() : null;
     return NatGateway.builder()
             .natGatewayId(natId)

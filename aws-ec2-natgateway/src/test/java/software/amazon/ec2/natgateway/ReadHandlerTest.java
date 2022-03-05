@@ -26,7 +26,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -49,13 +52,13 @@ public class ReadHandlerTest extends AbstractTestBase {
     }
 
     @AfterEach
-    public void tear_down() {
+    public void tearDown() {
         verify(Ec2Client, atLeastOnce()).serviceName();
         verifyNoMoreInteractions(Ec2Client);
     }
 
     @Test
-    public void handleRequest_SimpleSuccess() {
+    public void handleRequestSimpleSuccess() {
         final NatGateway natGateway = buildNatGatewayModel(NAT_ID, CONN_PUBLIC, State.AVAILABLE.toString());
 
         final DescribeNatGatewaysResponse describeResponse = DescribeNatGatewaysResponse.builder().natGateways(Collections.singletonList(natGateway)).build();
@@ -76,7 +79,7 @@ public class ReadHandlerTest extends AbstractTestBase {
     }
 
     @Test
-    public void handleRequest_FilterLimitExceeded() {
+    public void handleRequestFilterLimitExceeded() {
         AwsErrorDetails awsErrorDetails = AwsErrorDetails.builder().errorCode("FilterLimitExceeded").build();
         final AwsServiceException awsServiceException = AwsServiceException.builder().awsErrorDetails(awsErrorDetails).build();
 

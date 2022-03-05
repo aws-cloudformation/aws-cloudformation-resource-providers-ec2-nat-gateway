@@ -23,6 +23,6 @@ public class ReadHandler extends BaseHandlerStd {
                 callbackContext)
             .translateToServiceRequest(Translator::translateToReadRequest)
             .makeServiceCall((awsRequest, _proxyClient) -> readResource(awsRequest, proxyClient , logger))
-            .done(awsResponse -> ProgressEvent.defaultSuccessHandler(Translator.translateFromReadResponse(awsResponse)));
+            .done(natGateway -> ProgressEvent.defaultSuccessHandler(Translator.translateNatGatewayToResourceModel(natGateway)));
     }
 }

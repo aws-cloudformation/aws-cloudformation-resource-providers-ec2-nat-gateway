@@ -35,7 +35,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -62,12 +65,12 @@ public class UpdateHandlerTest extends AbstractTestBase {
     }
 
     @AfterEach
-    public void tear_down() {
+    public void tearDown() {
         verify(Ec2Client, atLeastOnce()).serviceName();
         verifyNoMoreInteractions(Ec2Client);
     }
 
-    public void buildResourceModels(List<Tag> oldTags, List<Tag> newTags){
+    public void buildResourceModels(List<Tag> oldTags, List<Tag> newTags) {
         oldModel = ResourceModel.builder()
                 .id(NAT_ID)
                 .subnetId(SUBNET_ID)
@@ -86,7 +89,7 @@ public class UpdateHandlerTest extends AbstractTestBase {
     }
 
     @Test
-    public void handleRequest_updateOnlyAddsTags() {
+    public void handleRequestUpdateOnlyAddsTags() {
         final List<Tag> newTags = new ArrayList<>(TAGS);
         newTags.add(TAG_2);
 
@@ -120,7 +123,7 @@ public class UpdateHandlerTest extends AbstractTestBase {
     }
 
     @Test
-    public void handleRequest_updateOnlyRemovesTags() {
+    public void handleRequestUpdateOnlyRemovesTags() {
         final List<Tag> newTags = new ArrayList<>();
 
         NatGateway natGateway = buildNatGatewayModel(NAT_ID, CONN_PUBLIC, State.AVAILABLE.toString());
@@ -153,7 +156,7 @@ public class UpdateHandlerTest extends AbstractTestBase {
     }
 
     @Test
-    public void handleRequest_updateAddsAndRemovesTags() {
+    public void handleRequestUpdateAddsAndRemovesTags() {
         final List<Tag> newTags = new ArrayList<>();
         newTags.add(TAG_2);
 
@@ -190,7 +193,7 @@ public class UpdateHandlerTest extends AbstractTestBase {
     }
 
     @Test
-    public void handleRequest_UpdateDeletedNat() {
+    public void handleRequestUpdateDeletedNat() {
         final NatGateway natGateway = buildNatGatewayModel(NAT_ID, CONN_PUBLIC, State.DELETED.toString());
 
         final DescribeNatGatewaysResponse describeResponse = DescribeNatGatewaysResponse.builder().natGateways(Collections.singletonList(natGateway)).build();
@@ -205,7 +208,7 @@ public class UpdateHandlerTest extends AbstractTestBase {
     }
 
     @Test
-    public void handleRequest_invalidTagKey(){
+    public void handleRequestInvalidTagKey() {
         final List<Tag> newTags = new ArrayList<>(TAGS);
         newTags.add(TAG_2);
         NatGateway natGateway = buildNatGatewayModel(NAT_ID, CONN_PUBLIC, State.AVAILABLE.toString());
@@ -231,7 +234,7 @@ public class UpdateHandlerTest extends AbstractTestBase {
     }
 
     @Test
-    public void handleRequest_tagLimitExceeded(){
+    public void handleRequestTagLimitExceeded() {
         final List<Tag> newTags = new ArrayList<>(TAGS);
         newTags.add(TAG_2);
         NatGateway natGateway = buildNatGatewayModel(NAT_ID, CONN_PUBLIC, State.AVAILABLE.toString());
@@ -257,7 +260,7 @@ public class UpdateHandlerTest extends AbstractTestBase {
     }
 
     @Test
-    public void handleRequest_updateNullTags() {
+    public void handleRequestUpdateNullTags() {
         NatGateway natGateway = buildNatGatewayModel(NAT_ID, CONN_PUBLIC, State.AVAILABLE.toString());
         natGateway = natGateway.toBuilder().tags(new ArrayList<>()).build();
 

@@ -7,17 +7,25 @@ import software.amazon.awssdk.services.ec2.model.DescribeNatGatewaysRequest;
 import software.amazon.awssdk.services.ec2.model.DescribeNatGatewaysResponse;
 import software.amazon.awssdk.services.ec2.model.NatGateway;
 import software.amazon.awssdk.services.ec2.model.State;
-import software.amazon.cloudformation.proxy.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
+import software.amazon.cloudformation.proxy.OperationStatus;
+import software.amazon.cloudformation.proxy.ProgressEvent;
+import software.amazon.cloudformation.proxy.ProxyClient;
+import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
 import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class ListHandlerTest extends AbstractTestBase{
@@ -39,13 +47,13 @@ public class ListHandlerTest extends AbstractTestBase{
     }
 
     @AfterEach
-    public void tear_down() {
+    public void tearDown() {
         verify(Ec2Client, atLeastOnce()).serviceName();
         verifyNoMoreInteractions(Ec2Client);
     }
 
     @Test
-    public void handleRequest_SimpleSuccess() {
+    public void handleRequestSimpleSuccess() {
         final NatGateway natGateway = buildNatGatewayModel(NAT_ID, CONN_PUBLIC, State.AVAILABLE.toString());
         final NatGateway alternateNatGateway = buildNatGatewayModel(ALT_NAT_ID, CONN_PUBLIC, State.AVAILABLE.toString());
 
@@ -75,7 +83,7 @@ public class ListHandlerTest extends AbstractTestBase{
     }
 
     @Test
-    public void handleRequest_ListWithDeletedNat() {
+    public void handleRequestListWithDeletedNat() {
         final NatGateway natGateway = buildNatGatewayModel(NAT_ID, CONN_PUBLIC, State.AVAILABLE.toString());
         final NatGateway alternateNatGateway = buildNatGatewayModel(ALT_NAT_ID, CONN_PUBLIC, State.DELETED.toString());
 

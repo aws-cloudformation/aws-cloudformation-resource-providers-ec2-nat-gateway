@@ -46,7 +46,7 @@ public class CreateHandler extends BaseHandlerStd {
      * @param createNatGatewayRequest   Request made by the client
      * @param proxyClient               aws ec2 client used to make request
      * @param logger                    used to log
-     * @param model                     Resource Model
+     * @param model                     Nat Gateway Resource Model
      * @return CreateNatGateway Response
      */
     protected CreateNatGatewayResponse createResource(
@@ -90,10 +90,10 @@ public class CreateHandler extends BaseHandlerStd {
                             proxyClient.client()::describeNatGateways).natGateways().get(0);
             final String natId = natGateway.natGatewayId();
             final String state = natGateway.stateAsString();
-            if (state.equalsIgnoreCase(State.AVAILABLE.toString())) {
+            if (State.AVAILABLE.toString().equalsIgnoreCase(state)) {
                 logger.log(String.format("%s %s has stabilized and is fully created.", ResourceModel.TYPE_NAME, natId));
                 return true;
-            } else if(state.equalsIgnoreCase(State.FAILED.toString())){
+            } else if(State.FAILED.toString().equalsIgnoreCase(state)) {
                 final String message = String.format("NatGateway %s is in state %s and hence failed to stabilize. " +
                         "Detailed failure message: %s", natId, state, natGateway.failureMessage());
                 logger.log(message);

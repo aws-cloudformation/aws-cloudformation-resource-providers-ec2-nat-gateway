@@ -6,7 +6,12 @@ import software.amazon.awssdk.services.ec2.model.DescribeNatGatewaysRequest;
 import software.amazon.awssdk.services.ec2.model.DescribeNatGatewaysResponse;
 import software.amazon.awssdk.services.ec2.model.NatGateway;
 import software.amazon.awssdk.services.ec2.model.State;
-import software.amazon.cloudformation.proxy.*;
+import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
+import software.amazon.cloudformation.proxy.Logger;
+import software.amazon.cloudformation.proxy.OperationStatus;
+import software.amazon.cloudformation.proxy.ProgressEvent;
+import software.amazon.cloudformation.proxy.ProxyClient;
+import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -51,7 +56,7 @@ public class ListHandler extends BaseHandlerStd {
                     proxyClient.client()::describeNatGateways);
             // The List Handler should only list non-deleted NAT Gateways
             List<NatGateway> natGatewayList = describeNatGatewaysResponse.natGateways().stream()
-                    .filter(nat -> !(nat.stateAsString().equalsIgnoreCase(State.DELETED.toString())))
+                    .filter(nat -> !(State.DELETED.toString().equalsIgnoreCase(nat.stateAsString())))
                     .collect(Collectors.toList());
             describeNatGatewaysResponse = DescribeNatGatewaysResponse.builder().natGateways(natGatewayList).build();
         } catch (final AwsServiceException e) {
