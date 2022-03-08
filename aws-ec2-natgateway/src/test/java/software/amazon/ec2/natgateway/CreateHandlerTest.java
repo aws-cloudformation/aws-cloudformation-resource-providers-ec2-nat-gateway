@@ -153,7 +153,7 @@ public class CreateHandlerTest extends AbstractTestBase {
     }
 
     @Test
-    public void handleRequesteipNotFound() {
+    public void handleRequestEIPNotFound() {
         AwsErrorDetails awsErrorDetails = AwsErrorDetails.builder().errorCode("InvalidElasticIpID.NotFound").build();
         final AwsServiceException awsServiceException = AwsServiceException.builder().awsErrorDetails(awsErrorDetails).build();
 
@@ -169,7 +169,7 @@ public class CreateHandlerTest extends AbstractTestBase {
     }
 
     @Test
-    public void handleRequestnatLimitExceeded() {
+    public void handleRequestNatGatewayLimitExceeded() {
         AwsErrorDetails awsErrorDetails = AwsErrorDetails.builder().errorCode("NatGatewayLimitExceeded").build();
         final AwsServiceException awsServiceException = AwsServiceException.builder().awsErrorDetails(awsErrorDetails).build();
 
