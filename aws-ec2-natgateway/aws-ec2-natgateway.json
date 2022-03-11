@@ -1,0 +1,98 @@
+{
+    "typeName": "AWS::EC2::NatGateway",
+    "description": "An example resource schema demonstrating some basic constructs and validation rules.",
+    "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+    "definitions": {
+        "Tag": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "Key": {
+                    "type": "string"
+                },
+                "Value": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "Value",
+                "Key"
+            ]
+        }
+    },
+    "properties": {
+        "NatGatewayId": {
+            "type": "string",
+            "description": "Service generated ID for the NAT Gateway"
+        },
+        "AllocationId": {
+            "description": "[Public NAT gateway only] The allocation ID of the Elastic IP address that's associated with the NAT gateway",
+            "type": "string"
+        },
+        "ConnectivityType": {
+            "description": "Indicates whether the NAT gateway supports public or private connectivity.",
+            "type": "string"
+        },
+        "SubnetId": {
+            "description": "The ID of the subnet in which the NAT gateway is located.",
+            "type": "string"
+        },
+        "Tags": {
+            "description": "Any tags assigned to the virtual private gateway.",
+            "type": "array",
+            "uniqueItems": false,
+            "insertionOrder": false,
+            "items": {
+                "$ref": "#/definitions/Tag"
+            }
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+        "SubnetId"
+    ],
+    "createOnlyProperties": [
+        "/properties/SubnetId",
+        "/properties/ConnectivityType",
+        "/properties/AllocationId"
+    ],
+    "readOnlyProperties": [
+        "/properties/NatGatewayId"
+    ],
+    "primaryIdentifier": [
+        "/properties/NatGatewayId"
+    ],
+    "taggable": true,
+    "handlers": {
+        "create": {
+            "permissions": [
+                "ec2:CreateNatGateway",
+                "ec2:CreateTags",
+                "ec2:DescribeNatGateways"
+            ]
+        },
+        "read": {
+            "permissions": [
+                "ec2:DescribeNatGateways"
+            ]
+        },
+        "update": {
+            "permissions": [
+                "ec2:DescribeNatGateways",
+                "ec2:DeleteTags",
+                "ec2:CreateTags"
+            ]
+        },
+        "delete": {
+            "permissions": [
+                "ec2:DescibeNatGateways",
+                "ec2:DeleteNatGateway"
+            ]
+        },
+        "list": {
+            "permissions": [
+                "ec2:DescribeNatGateways"
+            ]
+        }
+    }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "aws-ec2-natgateway",
+  "version": "1.0.0",
+  "dependencies": {
+  }
+}

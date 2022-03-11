@@ -1,0 +1,13 @@
+{
+  "desiredResourceState": {
+    "SubnetId": "subnet-06f4daac41c5e7d19",
+    "AllocationId": "eipalloc-04010978235c3a4b9",
+    "Tags": [
+      {
+        "Key": "sampleKey",
+        "Value":"sampleValue"
+      }
+    ]
+  },
+  "previousResourceState": {}
+}

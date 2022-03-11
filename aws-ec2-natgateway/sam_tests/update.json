@@ -1,0 +1,28 @@
+{
+  "desiredResourceState": {
+    "NatGatewayId": "nat-0564c95c2e4542d82",
+    "SubnetId": "subnet-06f4daac41c5e7d19",
+    "AllocationId": "eipalloc-04010978235c3a4b9",
+    "Tags": [
+      {
+        "Key": "sampleKey",
+        "Value":"sampleValue"
+      }
+    ]
+  },
+  "previousResourceState": {
+    "NatGatewayId": "nat-0564c95c2e4542d82",
+    "SubnetId": "subnet-06f4daac41c5e7d19",
+    "AllocationId": "eipalloc-04010978235c3a4b9",
+    "Tags": [
+      {
+        "Key": "sampleKey",
+        "Value":"sampleValue"
+      },
+      {
+        "Key": "sampleKey1",
+        "Value":"sampleValue1"
+      }
+    ]
+  }
+}
