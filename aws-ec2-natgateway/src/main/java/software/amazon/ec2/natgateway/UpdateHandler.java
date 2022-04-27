@@ -81,11 +81,14 @@ public class UpdateHandler extends BaseHandlerStd {
             final ResourceHandlerRequest<ResourceModel> request) {
 
         final ResourceModel oldModel = request.getPreviousResourceState();
-        final List<Tag> tagsToDelete = new ArrayList<Tag>(oldModel.getTags());
-        tagsToDelete.removeAll(model.getTags());
+        final List<Tag> oldTags = oldModel.getTags() == null ? new ArrayList<Tag>() : oldModel.getTags();
+        final List<Tag> newTags = model.getTags() == null ? new ArrayList<Tag>() : model.getTags();
 
-        final List<Tag> tagsToCreate = new ArrayList<Tag>(model.getTags());
-        tagsToCreate.removeAll(oldModel.getTags());
+        final List<Tag> tagsToDelete = new ArrayList<Tag>(oldTags);
+        tagsToDelete.removeAll(newTags);
+
+        final List<Tag> tagsToCreate = new ArrayList<Tag>(newTags);
+        tagsToCreate.removeAll(oldTags);
 
         return ProgressEvent.progress(model, callbackContext)
                 .then(newProgress -> tagsToCreate.isEmpty() ? progress :
