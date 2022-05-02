@@ -83,7 +83,7 @@ public class CreateHandlerTest extends AbstractTestBase {
         assertThat(response.getResourceModels()).isNull();
         assertThat(response.getMessage()).isNull();
         assertThat(response.getErrorCode()).isNull();
-        assertThat(response.getResourceModel().getId().equals(NAT_ID));
+        assertThat(response.getResourceModel().getNatGatewayId().equals(NAT_ID));
     }
 
     @Test

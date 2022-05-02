@@ -6,7 +6,7 @@
     "SubnetId": {
       "type": "string"
     },
-    "Id": {
+    "NatGatewayId": {
       "type": "string"
     },
     "ConnectivityType": {
@@ -51,10 +51,10 @@
     "/properties/AllocationId"
   ],
   "primaryIdentifier": [
-    "/properties/Id"
+    "/properties/NatGatewayId"
   ],
   "readOnlyProperties": [
-    "/properties/Id"
+    "/properties/NatGatewayId"
   ],
   "tagging": {
     "taggable": true,

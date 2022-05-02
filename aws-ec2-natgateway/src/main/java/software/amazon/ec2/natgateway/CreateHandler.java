@@ -58,7 +58,7 @@ public class CreateHandler extends BaseHandlerStd {
         try {
             createNatGatewayResponse = proxyClient.injectCredentialsAndInvokeV2(createNatGatewayRequest,
                     proxyClient.client()::createNatGateway);
-            model.setId(createNatGatewayResponse.natGateway().natGatewayId());
+            model.setNatGatewayId(createNatGatewayResponse.natGateway().natGatewayId());
         } catch (final AwsServiceException e) {
             throw handleError(e);
         }
