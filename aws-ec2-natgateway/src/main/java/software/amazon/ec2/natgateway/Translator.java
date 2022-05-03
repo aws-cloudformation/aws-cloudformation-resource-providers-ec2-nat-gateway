@@ -49,7 +49,7 @@ public class Translator {
    */
   static DescribeNatGatewaysRequest translateToReadRequest(final ResourceModel model) {
     return DescribeNatGatewaysRequest.builder()
-            .natGatewayIds(Collections.singletonList(model.getId()))
+            .natGatewayIds(Collections.singletonList(model.getNatGatewayId()))
             .build();
   }
 
@@ -60,7 +60,7 @@ public class Translator {
    */
   static ResourceModel translateNatGatewayToResourceModel(final NatGateway natGateway) {
     return ResourceModel.builder()
-            .id(natGateway.natGatewayId())
+            .natGatewayId(natGateway.natGatewayId())
             .subnetId(natGateway.subnetId())
             .connectivityType(natGateway.connectivityTypeAsString())
             .allocationId(natGateway.natGatewayAddresses().get(0).allocationId())
@@ -74,7 +74,7 @@ public class Translator {
    * @return awsRequest the aws service request to delete a resource
    */
   static DeleteNatGatewayRequest translateToDeleteRequest(final ResourceModel model) {
-    return DeleteNatGatewayRequest.builder().natGatewayId(model.getId()).build();
+    return DeleteNatGatewayRequest.builder().natGatewayId(model.getNatGatewayId()).build();
   }
 
   /**
@@ -84,7 +84,7 @@ public class Translator {
    * @return awsRequest the aws service request to create the tags
    */
   static CreateTagsRequest translateToCreateTagsRequest(final List<software.amazon.ec2.natgateway.Tag> tagsToCreate, final ResourceModel model) {
-    return CreateTagsRequest.builder().tags(convertToSdkTags(tagsToCreate)).resources(model.getId()).build();
+    return CreateTagsRequest.builder().tags(convertToSdkTags(tagsToCreate)).resources(model.getNatGatewayId()).build();
   }
 
   /**
@@ -94,7 +94,7 @@ public class Translator {
    * @return awsRequest the aws service request to delete the tags
    */
   static DeleteTagsRequest translateToDeleteTagsRequest(final List<software.amazon.ec2.natgateway.Tag> tagsToDelete, final ResourceModel model) {
-    return DeleteTagsRequest.builder().tags(convertToSdkTags(tagsToDelete)).resources(model.getId()).build();
+    return DeleteTagsRequest.builder().tags(convertToSdkTags(tagsToDelete)).resources(model.getNatGatewayId()).build();
   }
 
   /**
@@ -114,7 +114,7 @@ public class Translator {
   static List<ResourceModel> translateFromListRequest(final DescribeNatGatewaysResponse describeNatGatewaysResponse) {
     return streamOfOrEmpty(describeNatGatewaysResponse.natGateways())
         .map(resource -> ResourceModel.builder()
-            .id(resource.natGatewayId())
+            .natGatewayId(resource.natGatewayId())
             .build())
         .collect(Collectors.toList());
   }

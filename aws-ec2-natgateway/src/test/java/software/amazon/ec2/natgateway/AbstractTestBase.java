@@ -84,7 +84,7 @@ public class AbstractTestBase {
 
   protected ResourceHandlerRequest<ResourceModel> createResourceHandlerRequest() {
     final ResourceModel model = ResourceModel.builder()
-            .id(NAT_ID)
+            .natGatewayId(NAT_ID)
             .subnetId(SUBNET_ID)
             .connectivityType(CONN_PUBLIC)
             .tags(Translator.convertToNatTags(TAGS))

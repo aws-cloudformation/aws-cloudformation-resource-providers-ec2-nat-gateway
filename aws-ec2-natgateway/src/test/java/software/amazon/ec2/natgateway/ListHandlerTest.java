@@ -63,8 +63,8 @@ public class ListHandlerTest extends AbstractTestBase{
 
         final ListHandler handler = new ListHandler();
 
-        final ResourceModel model1 = ResourceModel.builder().id(NAT_ID).build();
-        final ResourceModel model2 = ResourceModel.builder().id(ALT_NAT_ID).build();
+        final ResourceModel model1 = ResourceModel.builder().natGatewayId(NAT_ID).build();
+        final ResourceModel model2 = ResourceModel.builder().natGatewayId(ALT_NAT_ID).build();
 
         final ResourceHandlerRequest<ResourceModel> request = createResourceHandlerRequest();
 
@@ -93,8 +93,8 @@ public class ListHandlerTest extends AbstractTestBase{
 
         final ListHandler handler = new ListHandler();
 
-        final ResourceModel model1 = ResourceModel.builder().id(NAT_ID).build();
-        final ResourceModel model2 = ResourceModel.builder().id(ALT_NAT_ID).build();
+        final ResourceModel model1 = ResourceModel.builder().natGatewayId(NAT_ID).build();
+        final ResourceModel model2 = ResourceModel.builder().natGatewayId(ALT_NAT_ID).build();
 
         final ResourceHandlerRequest<ResourceModel> request = createResourceHandlerRequest();
 

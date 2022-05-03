@@ -72,7 +72,7 @@ public class UpdateHandlerTest extends AbstractTestBase {
 
     public void buildResourceModels(List<Tag> oldTags, List<Tag> newTags) {
         oldModel = ResourceModel.builder()
-                .id(NAT_ID)
+                .natGatewayId(NAT_ID)
                 .subnetId(SUBNET_ID)
                 .connectivityType(CONN_PUBLIC)
                 .tags(Translator.convertToNatTags(oldTags))
@@ -80,7 +80,7 @@ public class UpdateHandlerTest extends AbstractTestBase {
                 .build();
 
         newModel = ResourceModel.builder()
-                .id(NAT_ID)
+                .natGatewayId(NAT_ID)
                 .subnetId(SUBNET_ID)
                 .connectivityType(CONN_PUBLIC)
                 .tags(Translator.convertToNatTags(newTags))
