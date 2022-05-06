@@ -41,6 +41,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+import java.util.Map;
+import java.util.stream.Collectors;
+
 @ExtendWith(MockitoExtension.class)
 public class UpdateHandlerTest extends AbstractTestBase {
 
@@ -109,6 +112,9 @@ public class UpdateHandlerTest extends AbstractTestBase {
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
                 .previousResourceState(oldModel).desiredResourceState(newModel).build();
 
+        request.setPreviousResourceTags(oldModel.getTags().stream().collect(Collectors.toMap(tag -> tag.getKey(), tag -> tag.getValue())));
+        request.setDesiredResourceTags(newModel.getTags().stream().collect(Collectors.toMap(tag -> tag.getKey(), tag -> tag.getValue())));
+
         final ProgressEvent<ResourceModel, CallbackContext> response =
                 handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
 
@@ -141,6 +147,9 @@ public class UpdateHandlerTest extends AbstractTestBase {
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
                 .previousResourceState(oldModel).desiredResourceState(newModel).build();
+
+        request.setPreviousResourceTags(oldModel.getTags().stream().collect(Collectors.toMap(tag -> tag.getKey(), tag -> tag.getValue())));
+        request.setDesiredResourceTags(newModel.getTags().stream().collect(Collectors.toMap(tag -> tag.getKey(), tag -> tag.getValue())));
 
         final ProgressEvent<ResourceModel, CallbackContext> response =
                 handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
@@ -178,6 +187,9 @@ public class UpdateHandlerTest extends AbstractTestBase {
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
                 .previousResourceState(oldModel).desiredResourceState(newModel).build();
+
+        request.setPreviousResourceTags(oldModel.getTags().stream().collect(Collectors.toMap(tag -> tag.getKey(), tag -> tag.getValue())));
+        request.setDesiredResourceTags(newModel.getTags().stream().collect(Collectors.toMap(tag -> tag.getKey(), tag -> tag.getValue())));
 
         final ProgressEvent<ResourceModel, CallbackContext> response =
                 handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
@@ -228,6 +240,9 @@ public class UpdateHandlerTest extends AbstractTestBase {
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
                 .previousResourceState(oldModel).desiredResourceState(newModel).build();
 
+        request.setPreviousResourceTags(oldModel.getTags().stream().collect(Collectors.toMap(tag -> tag.getKey(), tag -> tag.getValue())));
+        request.setDesiredResourceTags(newModel.getTags().stream().collect(Collectors.toMap(tag -> tag.getKey(), tag -> tag.getValue())));
+
         Assertions.assertThrows(CfnInvalidRequestException.class, () -> {
             handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
         });
@@ -254,6 +269,9 @@ public class UpdateHandlerTest extends AbstractTestBase {
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
                 .previousResourceState(oldModel).desiredResourceState(newModel).build();
 
+        request.setPreviousResourceTags(oldModel.getTags().stream().collect(Collectors.toMap(tag -> tag.getKey(), tag -> tag.getValue())));
+        request.setDesiredResourceTags(newModel.getTags().stream().collect(Collectors.toMap(tag -> tag.getKey(), tag -> tag.getValue())));
+
         Assertions.assertThrows(CfnServiceLimitExceededException.class, () -> {
             handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
         });
@@ -273,6 +291,9 @@ public class UpdateHandlerTest extends AbstractTestBase {
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
                 .previousResourceState(oldModel).desiredResourceState(newModel).build();
+
+        request.setPreviousResourceTags(oldModel.getTags().stream().collect(Collectors.toMap(tag -> tag.getKey(), tag -> tag.getValue())));
+        request.setDesiredResourceTags(newModel.getTags().stream().collect(Collectors.toMap(tag -> tag.getKey(), tag -> tag.getValue())));
 
         final ProgressEvent<ResourceModel, CallbackContext> response =
                 handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);

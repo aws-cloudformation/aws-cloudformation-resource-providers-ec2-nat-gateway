@@ -33,7 +33,7 @@ public class CreateHandler extends BaseHandlerStd {
             .then(progress ->
                  proxy.initiate("AWS-EC2-NatGateway::Create", proxyClient,progress.getResourceModel(),
                          progress.getCallbackContext())
-                    .translateToServiceRequest(awsRequest -> Translator.translateToCreateRequest(model, clientToken))
+                    .translateToServiceRequest(awsRequest -> Translator.translateToCreateRequest(model, request, clientToken))
                     .makeServiceCall((awsRequest, client) -> createResource(awsRequest, proxyClient, logger, model))
                     .stabilize(this::isCreateStabilized) // Only moves on when isCreateStabilized returns true
                     .progress()

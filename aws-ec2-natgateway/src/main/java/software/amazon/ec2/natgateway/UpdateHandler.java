@@ -13,18 +13,21 @@ import software.amazon.cloudformation.proxy.ProxyClient;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class UpdateHandler extends BaseHandlerStd {
     private Logger logger;
 
     protected ProgressEvent<ResourceModel, CallbackContext> handleRequest(
-        final AmazonWebServicesClientProxy proxy,
-        final ResourceHandlerRequest<ResourceModel> request,
-        final CallbackContext callbackContext,
-        final ProxyClient<Ec2Client> proxyClient,
-        final Logger logger) {
+            final AmazonWebServicesClientProxy proxy,
+            final ResourceHandlerRequest<ResourceModel> request,
+            final CallbackContext callbackContext,
+            final ProxyClient<Ec2Client> proxyClient,
+            final Logger logger) {
 
         this.logger = logger;
 
@@ -80,15 +83,26 @@ public class UpdateHandler extends BaseHandlerStd {
             final CallbackContext callbackContext,
             final ResourceHandlerRequest<ResourceModel> request) {
 
-        final ResourceModel oldModel = request.getPreviousResourceState();
-        final List<Tag> oldTags = oldModel.getTags() == null ? new ArrayList<Tag>() : oldModel.getTags();
-        final List<Tag> newTags = model.getTags() == null ? new ArrayList<Tag>() : model.getTags();
+        final Map<String, String> oldTags = request.getPreviousResourceTags() == null ? Collections.emptyMap() : request.getPreviousResourceTags();;
+        final Map<String, String> newTags = request.getDesiredResourceTags() == null ? Collections.emptyMap() : request.getDesiredResourceTags();
 
-        final List<Tag> tagsToDelete = new ArrayList<Tag>(oldTags);
-        tagsToDelete.removeAll(newTags);
+        final Map<String, String> tagsToDelete = new HashMap<String, String>();
+        tagsToDelete.putAll(oldTags);
+        tagsToDelete.entrySet().removeAll(newTags.entrySet());
 
-        final List<Tag> tagsToCreate = new ArrayList<Tag>(newTags);
-        tagsToCreate.removeAll(oldTags);
+        final Map<String, String> tagsToCreate = new HashMap<String, String>();
+        tagsToCreate.putAll(newTags);
+        tagsToCreate.entrySet().removeAll(oldTags.entrySet());
+
+        // Adds system tags when updating after importing a resource
+        if (request.getPreviousSystemTags() == null && request.getSystemTags() != null) {
+            tagsToCreate.putAll(request.getSystemTags());
+        }
+
+        // Removes system tags if update is rolled back after importing a resource
+        if (request.getPreviousSystemTags() != null && request.getSystemTags() == null) {
+            tagsToDelete.putAll(request.getPreviousResourceTags());
+        }
 
         return ProgressEvent.progress(model, callbackContext)
                 .then(newProgress -> tagsToCreate.isEmpty() ? progress :
