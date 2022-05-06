@@ -23,11 +23,11 @@ public class UpdateHandler extends BaseHandlerStd {
     private Logger logger;
 
     protected ProgressEvent<ResourceModel, CallbackContext> handleRequest(
-            final AmazonWebServicesClientProxy proxy,
-            final ResourceHandlerRequest<ResourceModel> request,
-            final CallbackContext callbackContext,
-            final ProxyClient<Ec2Client> proxyClient,
-            final Logger logger) {
+        final AmazonWebServicesClientProxy proxy,
+        final ResourceHandlerRequest<ResourceModel> request,
+        final CallbackContext callbackContext,
+        final ProxyClient<Ec2Client> proxyClient,
+        final Logger logger) {
 
         this.logger = logger;
 
@@ -83,7 +83,7 @@ public class UpdateHandler extends BaseHandlerStd {
             final CallbackContext callbackContext,
             final ResourceHandlerRequest<ResourceModel> request) {
 
-        final Map<String, String> oldTags = request.getPreviousResourceTags() == null ? Collections.emptyMap() : request.getPreviousResourceTags();;
+        final Map<String, String> oldTags = request.getPreviousResourceTags() == null ? Collections.emptyMap() : request.getPreviousResourceTags();
         final Map<String, String> newTags = request.getDesiredResourceTags() == null ? Collections.emptyMap() : request.getDesiredResourceTags();
 
         final Map<String, String> tagsToDelete = new HashMap<String, String>();

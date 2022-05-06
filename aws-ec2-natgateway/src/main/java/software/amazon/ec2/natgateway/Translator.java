@@ -116,16 +116,16 @@ public class Translator {
    */
   static List<ResourceModel> translateFromListRequest(final DescribeNatGatewaysResponse describeNatGatewaysResponse) {
     return streamOfOrEmpty(describeNatGatewaysResponse.natGateways())
-            .map(resource -> ResourceModel.builder()
-                    .natGatewayId(resource.natGatewayId())
-                    .build())
-            .collect(Collectors.toList());
+        .map(resource -> ResourceModel.builder()
+            .natGatewayId(resource.natGatewayId())
+            .build())
+        .collect(Collectors.toList());
   }
 
   private static <T> Stream<T> streamOfOrEmpty(final Collection<T> collection) {
     return Optional.ofNullable(collection)
-            .map(Collection::stream)
-            .orElseGet(Stream::empty);
+        .map(Collection::stream)
+        .orElseGet(Stream::empty);
   }
 
   /**
