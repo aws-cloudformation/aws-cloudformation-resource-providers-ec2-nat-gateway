@@ -9,11 +9,14 @@ import software.amazon.awssdk.services.ec2.model.DeleteNatGatewayRequest;
 import software.amazon.awssdk.services.ec2.model.TagSpecification;
 import software.amazon.awssdk.services.ec2.model.Tag;
 import software.amazon.awssdk.services.ec2.model.NatGateway;
+import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -32,13 +35,13 @@ public class Translator {
    * @param model resource model
    * @return awsRequest the aws service request to create a resource
    */
-  static CreateNatGatewayRequest translateToCreateRequest(final ResourceModel model, final String token) {
+  static CreateNatGatewayRequest translateToCreateRequest(final ResourceModel model, final ResourceHandlerRequest<ResourceModel> request, final String token) {
     return CreateNatGatewayRequest.builder()
             .clientToken(token)
             .subnetId(model.getSubnetId())
             .allocationId(model.getAllocationId())
             .connectivityType(model.getConnectivityType())
-            .tagSpecifications(convertNatTagsToTagSpecification(model.getTags()).orElse(null))
+            .tagSpecifications(convertNatTagsToTagSpecification(request.getDesiredResourceTags(), request.getSystemTags()).orElse(null))
             .build();
   }
 
@@ -64,7 +67,7 @@ public class Translator {
             .subnetId(natGateway.subnetId())
             .connectivityType(natGateway.connectivityTypeAsString())
             .allocationId(natGateway.natGatewayAddresses().get(0).allocationId())
-            .tags(convertToNatTags(natGateway.tags()))
+            .tags(convertToNatTags(natGateway.tags()).stream().filter(n -> !n.getKey().startsWith("aws:")).collect(Collectors.toList()))
             .build();
   }
 
@@ -83,7 +86,7 @@ public class Translator {
    * @param model resource model
    * @return awsRequest the aws service request to create the tags
    */
-  static CreateTagsRequest translateToCreateTagsRequest(final List<software.amazon.ec2.natgateway.Tag> tagsToCreate, final ResourceModel model) {
+  static CreateTagsRequest translateToCreateTagsRequest(Map<String, String> tagsToCreate, final ResourceModel model) {
     return CreateTagsRequest.builder().tags(convertToSdkTags(tagsToCreate)).resources(model.getNatGatewayId()).build();
   }
 
@@ -93,7 +96,7 @@ public class Translator {
    * @param model resource model
    * @return awsRequest the aws service request to delete the tags
    */
-  static DeleteTagsRequest translateToDeleteTagsRequest(final List<software.amazon.ec2.natgateway.Tag> tagsToDelete, final ResourceModel model) {
+  static DeleteTagsRequest translateToDeleteTagsRequest(Map<String, String> tagsToDelete, final ResourceModel model) {
     return DeleteTagsRequest.builder().tags(convertToSdkTags(tagsToDelete)).resources(model.getNatGatewayId()).build();
   }
 
@@ -145,8 +148,8 @@ public class Translator {
    * @param tags List of Nat Gateway Resource tags
    * @return List of SDK tags
    */
-  static List<Tag> convertToSdkTags(final List<software.amazon.ec2.natgateway.Tag> tags) {
-    return Optional.ofNullable(tags).orElse(Collections.emptyList())
+  static List<Tag> convertToSdkTags(Map<String, String> tags) {
+    return Optional.ofNullable(tags.entrySet()).orElse(Collections.emptySet())
             .stream()
             .map(tag -> Tag.builder()
                     .key(tag.getKey())
@@ -160,13 +163,22 @@ public class Translator {
    * @param modelTags list of Nat Gateway resource tags
    * @return List of TagSpecification tags
    */
-  private static Optional<List<TagSpecification>> convertNatTagsToTagSpecification(final List<software.amazon.ec2.natgateway.Tag> modelTags) {
-    if (modelTags == null) {
+  private static Optional<List<TagSpecification>> convertNatTagsToTagSpecification(Map<String, String> modelTags, Map<String, String> systemTags) {
+    Map<String, String> allTags = new HashMap<String, String>();
+    if (modelTags == null && systemTags == null) {
       return Optional.empty();
+    }
+
+    if (modelTags != null) {
+      allTags.putAll(modelTags);
+    }
+
+    if (systemTags != null) {
+      allTags.putAll(systemTags);
     }
     return Optional.of(Arrays.asList(TagSpecification.builder()
             .resourceType("natgateway")
-            .tags(convertToSdkTags(modelTags))
+            .tags(convertToSdkTags(allTags))
             .build()));
   }
 }
